@@ -15,6 +15,12 @@ private:
 	uchar sound_timer;
 	uchar sp;
 	ushort pc;
+
+	ushort GetNNN(ushort opcode);
+	uchar GetN(ushort opcode);
+	uchar GetX(ushort opcode);
+	uchar GetY(ushort opcode);
+	uchar GetKK(ushort opcode);
 public:
 	Chip8();
 	~Chip8();
