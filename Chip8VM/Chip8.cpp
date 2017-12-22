@@ -9,6 +9,7 @@ Chip8::Chip8() :
 	delay_timer(0),
 	sound_timer(0),
 	sp(0),
+	I(0),
 	pc(0x200)
 {
 }
@@ -106,7 +107,7 @@ void Chip8::Do8XY5(ushort opcode)
 
 void Chip8::Do8XY6(ushort opcode)
 {
-	V[0xF] = V[GetX(opcode)] & 0x000F;
+	V[0xF] = V[GetX(opcode)] & 0x1;
 	V[GetX(opcode)] >>= 1;
 }
 
@@ -115,6 +116,61 @@ void Chip8::Do8XY7(ushort opcode)
 	V[0xF] = (V[GetY(opcode)] > V[GetX(opcode)]);
 	V[GetX(opcode)] = V[GetY(opcode)] - V[GetX(opcode)];
 }
+
+void Chip8::Do8XYE(ushort opcode)
+{
+	V[0xF] = V[GetX(opcode)] & 0x1;
+	V[GetX(opcode)] <<= 1;
+}
+
+void Chip8::Do9XY0(ushort opcode)
+{
+	if (V[GetX(opcode)] == V[GetY(opcode)])
+		pc += 2;
+}
+
+void Chip8::DoANNN(ushort opcode)
+{
+	I = GetNNN(opcode);
+}
+
+void Chip8::DoBNNN(ushort opcode)
+{
+	pc = V[0] + GetNNN(opcode);
+}
+
+void Chip8::DoCXKK(ushort opcode)
+{
+	uchar random = 4;
+	V[GetX(opcode)] = random & GetKK(opcode);
+}
+
+void Chip8::DoFX07(ushort opcode)
+{
+	V[GetX(opcode)] = delay_timer;
+}
+
+void Chip8::DoFX0A(ushort opcode)
+{
+	std::cin >> V[GetX(opcode)]; //make key mapping later 
+}
+
+void Chip8::DoFX15(ushort opcode)
+{
+	delay_timer = V[GetX(opcode)];
+}
+
+void Chip8::DoFX18(ushort opcode)
+{
+	sound_timer = V[GetX(opcode)];
+}
+
+void Chip8::DoFX1E(ushort opcode)
+{
+	I += V[GetX(opcode)];
+}
+
+
 
 Chip8::~Chip8()
 {

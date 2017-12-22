@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <iostream>
 
 typedef unsigned short ushort;
 typedef unsigned char uchar;
@@ -15,6 +16,7 @@ private:
 	uchar sound_timer;
 	uchar sp;
 	ushort pc;
+	ushort I;
 
 	ushort GetNNN(ushort opcode);
 	uchar GetN(ushort opcode);
@@ -37,6 +39,22 @@ private:
 	void Do8XY5(ushort opcode);
 	void Do8XY6(ushort opcode);
 	void Do8XY7(ushort opcode);
+	void Do8XYE(ushort opcode);
+	void Do9XY0(ushort opcode);
+	void DoANNN(ushort opcode);
+	void DoBNNN(ushort opcode);
+	void DoCXKK(ushort opcode);
+	void DoDXYN(ushort opcode);
+	void DoEX9E(ushort opcode);
+	void DoEXA1(ushort opcode);
+	void DoFX07(ushort opcode);
+	void DoFX0A(ushort opcode);
+	void DoFX15(ushort opcode);
+	void DoFX18(ushort opcode);
+	void DoFX1E(ushort opcode);
+	void DoFX29(ushort opcode);
+	void DoFX33(ushort opcode);
+	void DoFX55(ushort opcode);
 public:
 	Chip8();
 	~Chip8();
