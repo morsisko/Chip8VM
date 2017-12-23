@@ -2,8 +2,10 @@
 #include <array>
 #include <iostream>
 
+class Chip8;
 typedef unsigned short ushort;
 typedef unsigned char uchar;
+typedef void (Chip8::*ProcFunc)(ushort);
 
 class Chip8
 {

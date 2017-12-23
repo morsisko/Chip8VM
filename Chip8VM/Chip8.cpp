@@ -152,7 +152,7 @@ void Chip8::DoFX07(ushort opcode)
 
 void Chip8::DoFX0A(ushort opcode)
 {
-	std::cin >> V[GetX(opcode)]; //make key mapping later 
+	std::cin >> V[GetX(opcode)]; //make key mapping later
 }
 
 void Chip8::DoFX15(ushort opcode)
