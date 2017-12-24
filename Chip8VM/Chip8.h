@@ -1,11 +1,19 @@
 #pragma once
 #include <array>
 #include <iostream>
+#include <vector>
 
 class Chip8;
 typedef unsigned short ushort;
 typedef unsigned char uchar;
 typedef void (Chip8::*ProcFunc)(ushort);
+
+struct OpcodeFunction
+{
+	ProcFunc func;
+	ushort mask;
+	ushort opcode;
+};
 
 class Chip8
 {
@@ -13,6 +21,7 @@ private:
 	std::array<uchar, 16> V;
 	std::array<ushort, 16> stack;
 	std::array<ushort, 4096> memory;
+	std::vector<OpcodeFunction> functions;
 
 	uchar delay_timer;
 	uchar sound_timer;
@@ -57,6 +66,8 @@ private:
 	void DoFX29(ushort opcode);
 	void DoFX33(ushort opcode);
 	void DoFX55(ushort opcode);
+
+	void InitializeFunctions();
 public:
 	Chip8();
 	~Chip8();

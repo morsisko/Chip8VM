@@ -12,6 +12,7 @@ Chip8::Chip8() :
 	I(0),
 	pc(0x200)
 {
+	InitializeFunctions();
 }
 
 ushort Chip8::GetNNN(ushort opcode)
@@ -170,7 +171,10 @@ void Chip8::DoFX1E(ushort opcode)
 	I += V[GetX(opcode)];
 }
 
-
+void Chip8::InitializeFunctions()
+{
+	functions = { {&Chip8::Do1NNN, 0xF000, 0x1000} };
+}
 
 Chip8::~Chip8()
 {
