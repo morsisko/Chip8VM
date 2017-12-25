@@ -40,6 +40,16 @@ uchar Chip8::GetKK(ushort opcode)
 	return opcode & 0x00FF;
 }
 
+void Chip8::Do00E0(ushort opcode)
+{
+	clear_display = true;
+}
+
+void Chip8::Do00EE(ushort opcode)
+{
+	pc = stack[--sp];
+}
+
 void Chip8::Do1NNN(ushort opcode)
 {
 	pc = GetNNN(opcode);
@@ -47,6 +57,8 @@ void Chip8::Do1NNN(ushort opcode)
 
 void Chip8::Do2NNN(ushort opcode)
 {
+	stack[sp++] = pc;
+	pc = GetNNN(opcode);
 }
 
 void Chip8::Do3XKK(ushort opcode)
@@ -189,19 +201,36 @@ void Chip8::DoFX1E(ushort opcode)
 
 void Chip8::DoFX29(ushort opcode)
 {
+
 }
 
 void Chip8::DoFX33(ushort opcode)
 {
+	uchar x = GetX(opcode);
+	memory[I] = x % 100;
+	memory[I + 1] = (x / 10) % 10;
+	memory[I + 2] = x % 10;
 }
 
 void Chip8::DoFX55(ushort opcode)
 {
+	uchar x = GetX(opcode);
+	for (int i = 0; i != x; ++i)
+		memory[I + i] = V[i];
+}
+
+void Chip8::DoFX65(ushort opcode)
+{
+	uchar x = GetX(opcode);
+	for (int i = 0; i != x; ++i)
+		V[i] = memory[I + i];
 }
 
 void Chip8::InitializeFunctions()
 {
 	functions = { {&Chip8::Do1NNN, 0xF000, 0x1000},
+	{ &Chip8::Do00E0, 0xFFFF, 0x00E0 },
+	{ &Chip8::Do00EE, 0xFFFF, 0x00EE },
 	{ &Chip8::Do2NNN, 0xF000, 0x2000 },
 	{ &Chip8::Do3XKK, 0xF000, 0x3000 }, 
 	{ &Chip8::Do4XKK, 0xF000, 0x4000 }, 
@@ -230,7 +259,8 @@ void Chip8::InitializeFunctions()
 	{ &Chip8::DoFX1E, 0xF0FF, 0xF01E },
 	{ &Chip8::DoFX29, 0xF0FF, 0xF029 },
 	{ &Chip8::DoFX33, 0xF0FF, 0xF033 },
-	{ &Chip8::DoFX55, 0xF0FF, 0xF055 }, };
+	{ &Chip8::DoFX55, 0xF0FF, 0xF055 },
+	{ &Chip8::DoFX65, 0xF0FF, 0xF065} };
 }
 
 Chip8::~Chip8()

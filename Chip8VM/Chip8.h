@@ -18,9 +18,13 @@ struct OpcodeFunction
 class Chip8
 {
 private:
-	std::array<uchar, 16> V;
-	std::array<ushort, 16> stack;
-	std::array<ushort, 4096> memory;
+	static const int REGISTERS_SIZE = 16;
+	static const int STACK_SIZE = 16;
+	static const int MEMORY_SIZE = 4096;
+
+	std::array<uchar, REGISTERS_SIZE> V;
+	std::array<ushort, STACK_SIZE> stack;
+	std::array<uchar, MEMORY_SIZE> memory;
 	std::vector<OpcodeFunction> functions;
 
 	uchar delay_timer;
@@ -29,12 +33,16 @@ private:
 	ushort pc;
 	ushort I;
 
+	bool clear_display = false;
+
 	ushort GetNNN(ushort opcode);
 	uchar GetN(ushort opcode);
 	uchar GetX(ushort opcode);
 	uchar GetY(ushort opcode);
 	uchar GetKK(ushort opcode);
 
+	void Do00E0(ushort opcode);
+	void Do00EE(ushort opcode);
 	void Do1NNN(ushort opcode);
 	void Do2NNN(ushort opcode);
 	void Do3XKK(ushort opcode);
@@ -66,6 +74,7 @@ private:
 	void DoFX29(ushort opcode);
 	void DoFX33(ushort opcode);
 	void DoFX55(ushort opcode);
+	void DoFX65(ushort opcode);
 
 	void InitializeFunctions();
 public:
