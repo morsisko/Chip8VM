@@ -21,6 +21,8 @@ private:
 	static const int REGISTERS_SIZE = 16;
 	static const int STACK_SIZE = 16;
 	static const int MEMORY_SIZE = 4096;
+	static const int SCREEN_WIDTH = 64;
+	static const int SCREEN_HEIHGT = 32;
 
 	std::array<uchar, REGISTERS_SIZE> V;
 	std::array<ushort, STACK_SIZE> stack;
@@ -32,8 +34,9 @@ private:
 	uchar sp;
 	ushort pc;
 	ushort I;
+	uchar screen[SCREEN_HEIHGT][SCREEN_WIDTH];
 
-	bool clear_display = false;
+	bool redraw = false;
 
 	ushort GetNNN(ushort opcode);
 	uchar GetN(ushort opcode);
@@ -77,6 +80,8 @@ private:
 	void DoFX65(ushort opcode);
 
 	void InitializeFunctions();
+	void InitializeFonts();
+	void ClearScreen();
 public:
 	Chip8();
 	~Chip8();
