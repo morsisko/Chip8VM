@@ -7,9 +7,10 @@ Chip8::Chip8() :
 	stack({}),
 	delay_timer(0),
 	sound_timer(0),
+	key_states({}),
 	sp(0),
 	I(0),
-	pc(0x200)
+	pc(PROGRAM_START)
 {
 	InitializeFunctions();
 	ClearScreen();
@@ -164,14 +165,37 @@ void Chip8::DoCXKK(ushort opcode)
 
 void Chip8::DoDXYN(ushort opcode)
 {
+	uchar x = GetX(opcode);
+	uchar y = GetY(opcode);
+	uchar n = GetN(opcode);
+
+	V[0xF] = 0;
+
+	for (int h = 0; y + h < SCREEN_HEIHGT && h < n; ++h)
+	{
+		for (int w = 0; x + w < SCREEN_WIDTH && w < SPRITE_WIDTH; ++w)
+		{
+			uchar pixel = ((I + h) >> w) & 0x1;
+			if (pixel && screen[y + h][x + w])
+				V[0xF] = 1;
+
+			screen[y + h][x + w] ^= pixel;
+		}
+	}
+
+	redraw = true;
 }
 
 void Chip8::DoEX9E(ushort opcode)
 {
+	if (key_states[GetX(opcode)])
+		pc += 2;
 }
 
 void Chip8::DoEXA1(ushort opcode)
 {
+	if (!key_states[GetX(opcode)])
+		pc += 2;
 }
 
 void Chip8::DoFX07(ushort opcode)
@@ -201,7 +225,7 @@ void Chip8::DoFX1E(ushort opcode)
 
 void Chip8::DoFX29(ushort opcode)
 {
-
+	I = GetX(opcode) * 5;
 }
 
 void Chip8::DoFX33(ushort opcode)
@@ -224,6 +248,11 @@ void Chip8::DoFX65(ushort opcode)
 	uchar x = GetX(opcode);
 	for (int i = 0; i != x; ++i)
 		V[i] = memory[I + i];
+}
+
+void Chip8::DoUnknown(ushort opcode)
+{
+	std::cout << "Unknown opcode: " << std::hex << opcode << " don't know how to continue.";
 }
 
 void Chip8::InitializeFunctions()
@@ -292,6 +321,33 @@ void Chip8::ClearScreen()
 	redraw = true;
 }
 
+void Chip8::ExecuteOpcode()
+{
+	ushort opcode = memory[pc] << 8 | memory[pc + 1];
+
+	auto& iterator = std::find(functions.begin(), functions.end(), opcode);
+
+	if (iterator != functions.end())
+	{
+		ProcFunc func = iterator->func;
+		(this->*func)(opcode);
+	}
+	else
+		DoUnknown(opcode);
+
+	pc += 2;
+}
+
+void Chip8::LoadROM(std::ifstream & file)
+{
+	file.read(reinterpret_cast<char*>(&memory[PROGRAM_START]), MEMORY_SIZE - PROGRAM_START);
+}
+
 Chip8::~Chip8()
 {
+}
+
+bool OpcodeFunction::operator==(const ushort & rhs) const
+{
+	return (rhs & mask) == opcode;
 }

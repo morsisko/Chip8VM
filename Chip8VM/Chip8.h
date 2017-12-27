@@ -2,6 +2,7 @@
 #include <array>
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 class Chip8;
 typedef unsigned short ushort;
@@ -13,6 +14,8 @@ struct OpcodeFunction
 	ProcFunc func;
 	ushort mask;
 	ushort opcode;
+
+	bool operator==(const ushort& rhs) const;
 };
 
 class Chip8
@@ -21,12 +24,16 @@ private:
 	static const int REGISTERS_SIZE = 16;
 	static const int STACK_SIZE = 16;
 	static const int MEMORY_SIZE = 4096;
+	static const int PROGRAM_START = 512;
 	static const int SCREEN_WIDTH = 64;
 	static const int SCREEN_HEIHGT = 32;
+	static const int KEYPAD_SIZE = 16;
+	static const int SPRITE_WIDTH = 8;
 
 	std::array<uchar, REGISTERS_SIZE> V;
 	std::array<ushort, STACK_SIZE> stack;
 	std::array<uchar, MEMORY_SIZE> memory;
+	std::array<bool, KEYPAD_SIZE> key_states;
 	std::vector<OpcodeFunction> functions;
 
 	uchar delay_timer;
@@ -78,10 +85,13 @@ private:
 	void DoFX33(ushort opcode);
 	void DoFX55(ushort opcode);
 	void DoFX65(ushort opcode);
+	void DoUnknown(ushort opcode);
 
 	void InitializeFunctions();
 	void InitializeFonts();
 	void ClearScreen();
+	void ExecuteOpcode();
+	void LoadROM(std::ifstream& file);
 public:
 	Chip8();
 	~Chip8();
