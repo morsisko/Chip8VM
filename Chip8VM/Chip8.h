@@ -91,6 +91,7 @@ private:
 	void InitializeFonts();
 	void ClearScreen();
 	void ExecuteOpcode();
+	void AffectTimers();
 	void LoadROM(std::ifstream& file);
 public:
 	Chip8();

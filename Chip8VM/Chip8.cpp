@@ -338,6 +338,15 @@ void Chip8::ExecuteOpcode()
 	pc += 2;
 }
 
+void Chip8::AffectTimers()
+{
+	if (delay_timer)
+		delay_timer--;
+
+	if (sound_timer)
+		sound_timer--;
+}
+
 void Chip8::LoadROM(std::ifstream & file)
 {
 	file.read(reinterpret_cast<char*>(&memory[PROGRAM_START]), MEMORY_SIZE - PROGRAM_START);
