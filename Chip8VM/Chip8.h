@@ -20,7 +20,7 @@ struct OpcodeFunction
 
 class Chip8
 {
-private:
+public:
 	static const int REGISTERS_SIZE = 16;
 	static const int STACK_SIZE = 16;
 	static const int MEMORY_SIZE = 4096;
@@ -30,6 +30,7 @@ private:
 	static const int KEYPAD_SIZE = 16;
 	static const int SPRITE_WIDTH = 8;
 
+private:
 	std::array<uchar, REGISTERS_SIZE> V;
 	std::array<ushort, STACK_SIZE> stack;
 	std::array<uchar, MEMORY_SIZE> memory;
@@ -90,11 +91,13 @@ private:
 	void InitializeFunctions();
 	void InitializeFonts();
 	void ClearScreen();
-	void ExecuteOpcode();
-	void AffectTimers();
-	void LoadROM(std::ifstream& file);
 public:
 	Chip8();
+	void LoadROM(std::ifstream& file);
+	uchar GetPixel(int x, int y);
+	void ExecuteOpcode();
+	void AffectTimers();
+	bool ShouldRedraw();
 	~Chip8();
 };
 

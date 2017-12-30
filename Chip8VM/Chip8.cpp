@@ -13,6 +13,7 @@ Chip8::Chip8() :
 	pc(PROGRAM_START)
 {
 	InitializeFunctions();
+	InitializeFonts();
 	ClearScreen();
 }
 
@@ -54,12 +55,14 @@ void Chip8::Do00EE(ushort opcode)
 void Chip8::Do1NNN(ushort opcode)
 {
 	pc = GetNNN(opcode);
+	pc -= 2;
 }
 
 void Chip8::Do2NNN(ushort opcode)
 {
 	stack[sp++] = pc;
 	pc = GetNNN(opcode);
+	pc -= 2;
 }
 
 void Chip8::Do3XKK(ushort opcode)
@@ -155,19 +158,21 @@ void Chip8::DoANNN(ushort opcode)
 void Chip8::DoBNNN(ushort opcode)
 {
 	pc = V[0] + GetNNN(opcode);
+	pc -= 2;
 }
 
 void Chip8::DoCXKK(ushort opcode)
 {
-	uchar random = 4;
+	uchar random = 5;
 	V[GetX(opcode)] = random & GetKK(opcode);
 }
 
 void Chip8::DoDXYN(ushort opcode)
 {
-	uchar x = GetX(opcode);
-	uchar y = GetY(opcode);
+	uchar x = V[GetX(opcode)];
+	uchar y = V[GetY(opcode)];
 	uchar n = GetN(opcode);
+	std::cout << "Draw at x = " << (int)x << " " << "y = " << (int)y << " " << "h = " << (int)n << std::endl;
 
 	V[0xF] = 0;
 
@@ -175,7 +180,7 @@ void Chip8::DoDXYN(ushort opcode)
 	{
 		for (int w = 0; x + w < SCREEN_WIDTH && w < SPRITE_WIDTH; ++w)
 		{
-			uchar pixel = ((I + h) >> w) & 0x1;
+			uchar pixel = (memory[I + h] >> (SPRITE_WIDTH - w - 1)) & 0x1;
 			if (pixel && screen[y + h][x + w])
 				V[0xF] = 1;
 
@@ -188,13 +193,13 @@ void Chip8::DoDXYN(ushort opcode)
 
 void Chip8::DoEX9E(ushort opcode)
 {
-	if (key_states[GetX(opcode)])
+	if (key_states[V[GetX(opcode)]])
 		pc += 2;
 }
 
 void Chip8::DoEXA1(ushort opcode)
 {
-	if (!key_states[GetX(opcode)])
+	if (!key_states[V[GetX(opcode)]])
 		pc += 2;
 }
 
@@ -225,12 +230,12 @@ void Chip8::DoFX1E(ushort opcode)
 
 void Chip8::DoFX29(ushort opcode)
 {
-	I = GetX(opcode) * 5;
+	I = V[GetX(opcode)] * 5;
 }
 
 void Chip8::DoFX33(ushort opcode)
 {
-	uchar x = GetX(opcode);
+	uchar x = V[GetX(opcode)];
 	memory[I] = x % 100;
 	memory[I + 1] = (x / 10) % 10;
 	memory[I + 2] = x % 10;
@@ -252,7 +257,7 @@ void Chip8::DoFX65(ushort opcode)
 
 void Chip8::DoUnknown(ushort opcode)
 {
-	std::cout << "Unknown opcode: " << std::hex << opcode << " don't know how to continue.";
+	std::cout << "Unknown opcode: " << std::hex << opcode << " don't know how to continue." << std::endl;
 }
 
 void Chip8::InitializeFunctions()
@@ -266,6 +271,7 @@ void Chip8::InitializeFunctions()
 	{ &Chip8::Do5XY0, 0xF00F, 0x5000 }, 
 	{ &Chip8::Do6XKK, 0xF000, 0x6000 }, 
 	{ &Chip8::Do7XKK, 0xF000, 0x7000 }, 
+	{ &Chip8::Do8XY0, 0xF00F, 0x8000 },
 	{ &Chip8::Do8XY1, 0xF00F, 0x8001 }, 
 	{ &Chip8::Do8XY2, 0xF00F, 0x8002 },
 	{ &Chip8::Do8XY3, 0xF00F, 0x8003 },
@@ -347,9 +353,22 @@ void Chip8::AffectTimers()
 		sound_timer--;
 }
 
+bool Chip8::ShouldRedraw()
+{
+	bool temp = redraw;
+	if (redraw) 
+		redraw = false;
+	return temp;
+}
+
 void Chip8::LoadROM(std::ifstream & file)
 {
 	file.read(reinterpret_cast<char*>(&memory[PROGRAM_START]), MEMORY_SIZE - PROGRAM_START);
+}
+
+uchar Chip8::GetPixel(int x, int y)
+{
+	return screen[y][x];
 }
 
 Chip8::~Chip8()
