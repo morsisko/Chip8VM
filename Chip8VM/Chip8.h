@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <SFML\Graphics.hpp>
 
 class Chip8;
 typedef unsigned short ushort;
@@ -34,7 +35,7 @@ private:
 	std::array<uchar, REGISTERS_SIZE> V;
 	std::array<ushort, STACK_SIZE> stack;
 	std::array<uchar, MEMORY_SIZE> memory;
-	std::array<bool, KEYPAD_SIZE> key_states;
+	std::array<sf::Keyboard::Key, KEYPAD_SIZE> key_map;
 	std::vector<OpcodeFunction> functions;
 
 	uchar delay_timer;
@@ -91,6 +92,7 @@ private:
 	void InitializeFunctions();
 	void InitializeFonts();
 	void ClearScreen();
+	void InitializeKeyMap();
 public:
 	Chip8();
 	void LoadROM(std::ifstream& file);

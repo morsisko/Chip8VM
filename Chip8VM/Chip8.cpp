@@ -7,13 +7,13 @@ Chip8::Chip8() :
 	stack({}),
 	delay_timer(0),
 	sound_timer(0),
-	key_states({}),
 	sp(0),
 	I(0),
 	pc(PROGRAM_START)
 {
 	InitializeFunctions();
 	InitializeFonts();
+	InitializeKeyMap();
 	ClearScreen();
 }
 
@@ -193,13 +193,13 @@ void Chip8::DoDXYN(ushort opcode)
 
 void Chip8::DoEX9E(ushort opcode)
 {
-	if (key_states[V[GetX(opcode)]])
+	if (sf::Keyboard::isKeyPressed(key_map[V[GetX(opcode)]]))
 		pc += 2;
 }
 
 void Chip8::DoEXA1(ushort opcode)
 {
-	if (!key_states[V[GetX(opcode)]])
+	if (!sf::Keyboard::isKeyPressed(key_map[V[GetX(opcode)]]))
 		pc += 2;
 }
 
@@ -325,6 +325,13 @@ void Chip8::ClearScreen()
 			screen[y][x] = 0;
 
 	redraw = true;
+}
+
+void Chip8::InitializeKeyMap()
+{
+	key_map = { sf::Keyboard::Key::Q, sf::Keyboard::Key::W, sf::Keyboard::Key::E, sf::Keyboard::Key::R, sf::Keyboard::Key::T,
+		sf::Keyboard::Key::A, sf::Keyboard::Key::S, sf::Keyboard::Key::D, sf::Keyboard::Key::F, sf::Keyboard::Key::G,
+		sf::Keyboard::Key::Z, sf::Keyboard::Key::X, sf::Keyboard::Key::C, sf::Keyboard::Key::V, sf::Keyboard::Key::B, sf::Keyboard::Key::N };
 }
 
 void Chip8::ExecuteOpcode()

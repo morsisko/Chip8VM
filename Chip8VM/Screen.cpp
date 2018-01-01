@@ -52,7 +52,7 @@ void Screen::InitVertices()
 			quad[3].position = sf::Vector2f(i * ratio, (j + 1) * ratio);
 		}
 
-	for (int i = 0; i < vertices.getVertexCount(); ++i)
+	for (size_t i = 0; i < vertices.getVertexCount(); ++i)
 		vertices[i].color = sf::Color::Black;
 }
 
